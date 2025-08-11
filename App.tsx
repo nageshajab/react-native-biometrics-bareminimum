@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { RootTabParamList, RootStackParamList } from './types';
 
-import ReactNativeBiometrics from 'react-native-biometrics';
+//import ReactNativeBiometrics from 'react-native-biometrics';
 import { NavigationContainer } from '@react-navigation/native';
 import { navigationRef } from './navigationRef';
 import * as React from 'react';
@@ -25,9 +25,9 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const isDarkMode = useColorScheme() === 'dark';
-  const rnBiometrics = new ReactNativeBiometrics({
-    allowDeviceCredentials: true,
-  });
+  // const rnBiometrics = new ReactNativeBiometrics({
+  //   allowDeviceCredentials: true,
+  // });
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -37,9 +37,22 @@ function App() {
     checkLoginStatus();
   }, []);
 
-  const TabNavigator = () => {
+  const TabNavigator = ({
+    handleLoginStatusChange,
+  }: {
+    handleLoginStatusChange: (loggedIn: boolean) => void;
+  }) => {
     return (
-      <Tab.Navigator>
+      <Tab.Navigator
+        screenOptions={{
+          headerRight: () => (
+            <Button
+              title="Logout"
+              onPress={() => handleLoginStatusChange(false)}
+            />
+          ),
+        }}
+      >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
@@ -56,7 +69,9 @@ function App() {
         {isLoggedIn ? (
           <Stack.Screen
             name="Tabs"
-            component={TabNavigator}
+            component={() => (
+              <TabNavigator handleLoginStatusChange={handleLoginStatusChange} />
+            )}
             options={{ headerShown: false }}
           />
         ) : (

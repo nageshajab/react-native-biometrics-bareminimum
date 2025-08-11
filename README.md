@@ -39,3 +39,10 @@ npm install @react-navigation/native-stack
 npm install @react-navigation/bottom-tabs
 
 ```
+
+## troubleshooting help
+
+1. when app suddenly stop working check whether you have installed any new npm packages
+2. go to android folder, and run "gradlew clean" and then start debugging
+3. check from android studio whether the emulator is starting normally
+4. in some cases you might have to create a new device emulator

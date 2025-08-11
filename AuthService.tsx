@@ -1,4 +1,4 @@
-import * as Keychain from 'react-native-keychain';
+//import * as Keychain from 'react-native-keychain';
 
 type RootStackParamList = {
   Login: undefined;
@@ -8,11 +8,11 @@ type RootStackParamList = {
 const AuthService = {
   checkToken: async (navigation: any) => {
     try {
-      const credentials = await Keychain.getGenericPassword();
-      if (!credentials) {
-        navigation.navigate('Login');
-        return false;
-      }
+      //     const credentials = await Keychain.getGenericPassword();
+      // if (!credentials) {
+      //   navigation.navigate('Login');
+      //   return false;
+      // }
       return true;
     } catch (error) {
       console.error('Error checking token:', error);

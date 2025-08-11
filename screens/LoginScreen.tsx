@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootTabParamList } from '../types';
-import * as Keychain from 'react-native-keychain';
+//import * as Keychain from 'react-native-keychain';
 import { navigationRef } from '../navigationRef';
 import { RootStackParamList } from '../types';
 
@@ -18,7 +18,7 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
   const handleLogin = async () => {
     if (username === 'test' && password === 'test') {
       try {
-        await Keychain.setGenericPassword('token', 'your_token_value');
+        // await Keychain.setGenericPassword('token', 'your_token_value');
         onLoginStatusChange(true);
       } catch (error) {
         console.error('Error storing token:', error);
