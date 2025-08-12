@@ -8,8 +8,6 @@ import {
   Button,
 } from 'react-native';
 import { RootTabParamList, RootStackParamList } from './types';
-
-//import ReactNativeBiometrics from 'react-native-biometrics';
 import { NavigationContainer } from '@react-navigation/native';
 import { navigationRef } from './navigationRef';
 import * as React from 'react';
@@ -18,6 +16,7 @@ import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import LoginScreen from './screens/LoginScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import * as Keychain from 'react-native-keychain';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -25,9 +24,6 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const isDarkMode = useColorScheme() === 'dark';
-  // const rnBiometrics = new ReactNativeBiometrics({
-  //   allowDeviceCredentials: true,
-  // });
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -59,7 +55,10 @@ function App() {
     );
   };
 
-  const handleLoginStatusChange = (loggedIn: boolean) => {
+  const handleLoginStatusChange = async (loggedIn: boolean) => {
+    if (!loggedIn) {
+      await Keychain.resetGenericPassword();
+    }
     setIsLoggedIn(loggedIn);
   };
 

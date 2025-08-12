@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootTabParamList } from '../types';
-//import * as Keychain from 'react-native-keychain';
+import * as Keychain from 'react-native-keychain';
 import { navigationRef } from '../navigationRef';
 import { RootStackParamList } from '../types';
 import ReactNativeBiometrics from 'react-native-biometrics';
@@ -38,16 +38,17 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
 
     rnBiometrics
       .simplePrompt({ promptMessage: 'Confirm fingerprint or Face ID' })
-      .then(resultObject => {
+      .then(async resultObject => {
         const { success } = resultObject;
-
         if (success) {
+          await Keychain.setGenericPassword('token', 'your_token_value');
+          ToastAndroid.show('token stored', ToastAndroid.SHORT);
           onLoginStatusChange(true); // Proceed to login
         } else {
           setError('User cancelled biometric authentication');
         }
       })
-      .catch(() => {
+      .catch(error => {
         setError('Biometric authentication failed');
       });
   };
@@ -55,7 +56,8 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
   const handleLogin = async () => {
     if (username === 'test' && password === 'test') {
       try {
-        // await Keychain.setGenericPassword('token', 'your_token_value');
+        await Keychain.setGenericPassword('token', 'your_token_value');
+        ToastAndroid.show('token stored', ToastAndroid.SHORT);
         onLoginStatusChange(true);
       } catch (error) {
         console.error('Error storing token:', error);

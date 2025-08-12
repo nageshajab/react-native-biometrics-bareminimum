@@ -46,3 +46,38 @@ npm install @react-navigation/bottom-tabs
 2. Go to android folder, and run "gradlew clean" and then start debugging
 3. Check from android studio whether the emulator is starting normally
 4. In some cases you might have to create a new device emulator
+
+## using react-native-biometrics library
+
+npm install react-native-biometrics
+Using this library to handle biometric authentication
+check out its code in LoginScreen.tsx
+
+## using react-native-keychain
+
+npm install react-native-keychain
+
+### store token
+
+Once user logged in we store token in LoginScreen.tsx
+
+```sh
+await Keychain.setGenericPassword
+```
+
+### get token, validate at common place
+
+```sh
+const credentials = await Keychain.getGenericPassword();
+```
+
+if credentilas is true, that means valid user
+code is handled in file AuthService.tsx
+
+### clear token after user logout
+
+code is in App.tsx file, handleLoginStatusChange function
+
+```sh
+   await Keychain.resetGenericPassword();
+```
