@@ -40,13 +40,6 @@ npm install @react-navigation/bottom-tabs
 
 ```
 
-## troubleshooting help
-
-1. When app suddenly stop working check whether you have installed any new npm packages
-2. Go to android folder, and run "gradlew clean" and then start debugging
-3. Check from android studio whether the emulator is starting normally
-4. In some cases you might have to create a new device emulator
-
 ## using react-native-biometrics library
 
 npm install react-native-biometrics
@@ -81,3 +74,10 @@ code is in App.tsx file, handleLoginStatusChange function
 ```sh
    await Keychain.resetGenericPassword();
 ```
+
+## troubleshooting help
+
+1. When app suddenly stop working check whether you have installed any new npm packages
+2. Go to android folder, and run "gradlew clean" and then start debugging
+3. Check from android studio whether the emulator is starting normally
+4. In some cases you might have to create a new device emulator
