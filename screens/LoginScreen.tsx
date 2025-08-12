@@ -1,3 +1,4 @@
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -46,6 +47,12 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Button title="Login" onPress={handleLogin} />
+
+      {/* Fingerprint Icon */}
+      <View style={styles.iconContainer}>
+        <Icon name="fingerprint" size={40} color="#007AFF" />
+        <Text style={styles.iconText}>Use Fingerprint</Text>
+      </View>
     </View>
   );
 };
@@ -71,6 +78,15 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 10,
     textAlign: 'center',
+  },
+  iconContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  iconText: {
+    marginTop: 5,
+    fontSize: 14,
+    color: '#007AFF',
   },
 });
 
