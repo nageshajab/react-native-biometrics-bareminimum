@@ -1,11 +1,19 @@
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  TextInput,
+  Button,
+  Text,
+  StyleSheet,
+  ToastAndroid,
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootTabParamList } from '../types';
 //import * as Keychain from 'react-native-keychain';
 import { navigationRef } from '../navigationRef';
 import { RootStackParamList } from '../types';
+import ReactNativeBiometrics from 'react-native-biometrics';
 
 type LoginScreenProps = {
   onLoginStatusChange: (loggedIn: boolean) => void;
@@ -15,6 +23,34 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  const handleBiometricAuth = async () => {
+    const rnBiometrics = new ReactNativeBiometrics({
+      allowDeviceCredentials: true,
+    });
+
+    const { available, biometryType } = await rnBiometrics.isSensorAvailable();
+
+    if (!available) {
+      setError('Biometric authentication not available');
+      return;
+    }
+
+    rnBiometrics
+      .simplePrompt({ promptMessage: 'Confirm fingerprint or Face ID' })
+      .then(resultObject => {
+        const { success } = resultObject;
+
+        if (success) {
+          onLoginStatusChange(true); // Proceed to login
+        } else {
+          setError('User cancelled biometric authentication');
+        }
+      })
+      .catch(() => {
+        setError('Biometric authentication failed');
+      });
+  };
 
   const handleLogin = async () => {
     if (username === 'test' && password === 'test') {
@@ -50,7 +86,12 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
 
       {/* Fingerprint Icon */}
       <View style={styles.iconContainer}>
-        <Icon name="fingerprint" size={40} color="#007AFF" />
+        <Icon
+          name="fingerprint"
+          size={40}
+          color="#007AFF"
+          onPress={handleBiometricAuth}
+        />
         <Text style={styles.iconText}>Use Fingerprint</Text>
       </View>
     </View>
