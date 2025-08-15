@@ -18,6 +18,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import LoginScreen from './screens/LoginScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Keychain from 'react-native-keychain';
+import { clearStoredToken } from './TokenHandler';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -96,7 +97,10 @@ function App() {
 
   const handleLoginStatusChange = async (loggedIn: boolean) => {
     if (!loggedIn) {
-      await Keychain.resetGenericPassword();
+      await clearStoredToken();
+      //await Keychain.resetGenericPassword();
+      // await Keychain.resetGenericPassword({ service: 'com.yourapp.msalToken' });
+      // cachedToken = null;
     }
     setIsLoggedIn(loggedIn);
   };

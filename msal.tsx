@@ -1,5 +1,4 @@
 import PublicClientApplication, {
-  MSALConfiguration,
   MSALInteractiveParams,
   MSALSilentParams,
   MSALResult,
@@ -62,7 +61,6 @@ class MSALService {
         'Sign-in returned no result (possibly cancelled by user).',
       );
     }
-    console.log('Signed in..' + result);
     return result!;
   }
   /**
