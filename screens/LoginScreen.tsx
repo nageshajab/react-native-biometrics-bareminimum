@@ -1,3 +1,4 @@
+import { msalService } from '../msal'; // adjust path as needed
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import React, { useEffect, useState } from 'react';
 import {
@@ -52,7 +53,15 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
         setError('Biometric authentication failed');
       });
   };
-
+  const handleSignIn = async () => {
+    try {
+      const result = await msalService.signIn(['User.Read']);
+      console.log('Signed in:', result.account);
+      // Save account info or token as needed
+    } catch (error) {
+      console.error('Sign-in failed:', error);
+    }
+  };
   const handleLogin = async () => {
     if (username === 'test' && password === 'test') {
       try {
@@ -85,7 +94,7 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Button title="Login" onPress={handleLogin} />
-
+      <Button title="Microsoft Entra" onPress={handleSignIn} />
       {/* Fingerprint Icon */}
       <View style={styles.iconContainer}>
         <Icon

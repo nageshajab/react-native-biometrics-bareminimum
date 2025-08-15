@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { msalService } from './msal'; // adjust path as needed
 import { ToastAndroid, SafeAreaView } from 'react-native';
 import {
   StatusBar,
@@ -25,28 +26,66 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const isDarkMode = useColorScheme() === 'dark';
 
+  // useEffect(() => {
+  //   const checkLoginStatus = async () => {
+  //     const loggedIn = false; // await your logic to check login status
+  //     setIsLoggedIn(loggedIn);
+  //   };
+  //   checkLoginStatus();
+  // }, []);
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      const loggedIn = false; // await your logic to check login status
-      setIsLoggedIn(loggedIn);
-    };
-    checkLoginStatus();
-  }, []);
+    const initializeMSAL = async () => {
+      try {
+        if (!msalService.ensureInitialized) {
+          await msalService.init();
+        }
 
+        console.log('✅ MSAL initialized');
+
+        const accounts = await msalService.getAccounts();
+        console.log('accounts', accounts);
+
+        if (accounts.length > 0) {
+          // Optionally acquire token silently to confirm session
+          try {
+            await msalService.getTokenSilent(accounts[0], ['User.Read']);
+            setIsLoggedIn(true);
+            console.log('✅ Session restored');
+          } catch {
+            console.log('⚠️ Silent token failed, user must sign in');
+          }
+        }
+      } catch (error) {
+        console.error('❌ MSAL init failed:', error);
+      }
+    };
+
+    initializeMSAL();
+  }, []);
+  const handleSignOut = async () => {
+    try {
+      const accounts = await msalService.getAccounts();
+      if (accounts.length > 0) {
+        await msalService.signOut(accounts[0]);
+        console.log('Signed out');
+      }
+      await Keychain.resetGenericPassword();
+      setIsLoggedIn(false);
+    } catch (error) {
+      console.error('Sign-out failed:', error);
+    }
+  };
   const TabNavigator = ({
     handleLoginStatusChange,
+    handleSignOut,
   }: {
     handleLoginStatusChange: (loggedIn: boolean) => void;
+    handleSignOut: () => void;
   }) => {
     return (
       <Tab.Navigator
         screenOptions={{
-          headerRight: () => (
-            <Button
-              title="Logout"
-              onPress={() => handleLoginStatusChange(false)}
-            />
-          ),
+          headerRight: () => <Button title="Logout" onPress={handleSignOut} />,
         }}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
@@ -69,7 +108,10 @@ function App() {
           <Stack.Screen
             name="Tabs"
             component={() => (
-              <TabNavigator handleLoginStatusChange={handleLoginStatusChange} />
+              <TabNavigator
+                handleLoginStatusChange={handleLoginStatusChange}
+                handleSignOut={handleSignOut}
+              />
             )}
             options={{ headerShown: false }}
           />

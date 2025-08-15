@@ -22,5 +22,16 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+    <activity android:name="com.microsoft.identity.client.BrowserTabActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data
+          android:scheme="msauth"
+          android:host="com.biometrics"
+          android:path="/2FJUv0rohqwxD0YdLtUvR0XYCv8=" />
+      </intent-filter>
+    </activity>
   </application>
 </manifest>
