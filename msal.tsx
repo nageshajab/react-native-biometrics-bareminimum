@@ -6,7 +6,6 @@ import PublicClientApplication, {
   MSALAccount,
   MSALSignoutParams,
 } from 'react-native-msal';
-import msalConfig from './msal_config';
 
 class MSALService {
   private pca: PublicClientApplication;
@@ -16,7 +15,7 @@ class MSALService {
       auth: {
         clientId: '2e989240-a5fc-41c1-8ed2-089f2db5bc4f',
         authority: 'https://login.microsoftonline.com/common',
-        redirectUri: 'msauth://com.biometrics/2FJUv0rohqwxD0YdLtUvR0XYCv8=',
+        redirectUri: 'msauth://com.biometrics/URKPrDTU8V1MeUOH4mnP2s1KgtM%3D',
       },
     });
   }
@@ -63,7 +62,7 @@ class MSALService {
         'Sign-in returned no result (possibly cancelled by user).',
       );
     }
-
+    console.log('Signed in..' + result);
     return result!;
   }
   /**

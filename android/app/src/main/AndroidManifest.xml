@@ -30,7 +30,7 @@
         <data
           android:scheme="msauth"
           android:host="com.biometrics"
-          android:path="/2FJUv0rohqwxD0YdLtUvR0XYCv8=" />
+          android:path="/URKPrDTU8V1MeUOH4mnP2s1KgtM=" />
       </intent-filter>
     </activity>
   </application>
