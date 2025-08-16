@@ -76,12 +76,15 @@ android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
+    compileSdkVersion 35
+
 
     namespace "com.biometrics"
     defaultConfig {
         applicationId "com.biometrics"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 24
+        targetSdkVersion 35
+        compileSdkVersion 35
         versionCode 1
         versionName "1.0"
     }

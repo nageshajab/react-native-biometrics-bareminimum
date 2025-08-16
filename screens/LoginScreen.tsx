@@ -1,5 +1,6 @@
+import { msalService } from '../msal'; // adjust path as needed
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TextInput,
@@ -7,13 +8,11 @@ import {
   Text,
   StyleSheet,
   ToastAndroid,
+  ActivityIndicator,
 } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootTabParamList } from '../types';
 import * as Keychain from 'react-native-keychain';
-import { navigationRef } from '../navigationRef';
-import { RootStackParamList } from '../types';
 import ReactNativeBiometrics from 'react-native-biometrics';
+import { getStoredToken, storeToken } from '../TokenHandler';
 
 type LoginScreenProps = {
   onLoginStatusChange: (loggedIn: boolean) => void;
@@ -23,13 +22,14 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false); // ⏳ Loading state
 
   const handleBiometricAuth = async () => {
     const rnBiometrics = new ReactNativeBiometrics({
       allowDeviceCredentials: true,
     });
 
-    const { available, biometryType } = await rnBiometrics.isSensorAvailable();
+    const { available } = await rnBiometrics.isSensorAvailable();
 
     if (!available) {
       setError('Biometric authentication not available');
@@ -41,14 +41,22 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
       .then(async resultObject => {
         const { success } = resultObject;
         if (success) {
-          await Keychain.setGenericPassword('token', 'your_token_value');
-          ToastAndroid.show('token stored', ToastAndroid.SHORT);
-          onLoginStatusChange(true); // Proceed to login
+          try {
+            setLoading(true); // Start loading
+            const result = await msalService.signIn(['User.Read']);
+            await storeToken(result);
+            ToastAndroid.show('Token stored', ToastAndroid.SHORT);
+            onLoginStatusChange(true);
+          } catch (err) {
+            setError('Sign-in failed');
+          } finally {
+            setLoading(false); // Stop loading
+          }
         } else {
           setError('User cancelled biometric authentication');
         }
       })
-      .catch(error => {
+      .catch(() => {
         setError('Biometric authentication failed');
       });
   };
@@ -57,7 +65,7 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
     if (username === 'test' && password === 'test') {
       try {
         await Keychain.setGenericPassword('token', 'your_token_value');
-        ToastAndroid.show('token stored', ToastAndroid.SHORT);
+        ToastAndroid.show('Token stored', ToastAndroid.SHORT);
         onLoginStatusChange(true);
       } catch (error) {
         console.error('Error storing token:', error);
@@ -69,33 +77,40 @@ const LoginScreen = ({ onLoginStatusChange }: LoginScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button title="Login" onPress={handleLogin} />
-
-      {/* Fingerprint Icon */}
-      <View style={styles.iconContainer}>
-        <Icon
-          name="fingerprint"
-          size={40}
-          color="#007AFF"
-          onPress={handleBiometricAuth}
-        />
-        <Text style={styles.iconText}>Use Fingerprint</Text>
-      </View>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Signing in, please wait...</Text>
+        </View>
+      ) : (
+        <>
+          <Text style={styles.title}>Login</Text>
+          <TextInput
+            placeholder="Username"
+            value={username}
+            onChangeText={setUsername}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+          />
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <Button title="Login" onPress={handleLogin} />
+          <View style={styles.iconContainer}>
+            <Icon
+              name="fingerprint"
+              size={40}
+              color="#007AFF"
+              onPress={handleBiometricAuth}
+            />
+            <Text style={styles.iconText}>Use Fingerprint</Text>
+          </View>
+        </>
+      )}
     </View>
   );
 };
@@ -130,6 +145,16 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 14,
     color: '#007AFF',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#555',
   },
 });
 
