@@ -21,21 +21,36 @@ import * as Keychain from 'react-native-keychain';
 import { clearStoredToken } from './TokenHandler';
 import { SessionContext } from './SessionContext';
 import MenuScreen from './screens/MenuScreen';
+import WatchlistScreen from './screens/WatchListScreen';
+import PendingrentScreen from './screens/PendingRentScreen';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const TabNavigator = ({
+  handleLoginStatusChange,
+  handleSignOut,
+}: {
+  handleLoginStatusChange: (loggedIn: boolean) => void;
+  handleSignOut: () => void;
+}) => {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerRight: () => <Button title="Logout" onPress={handleSignOut} />,
+      }}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Menu" component={MenuScreen} />
+    </Tab.Navigator>
+  );
+};
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const isDarkMode = useColorScheme() === 'dark';
 
-  // useEffect(() => {
-  //   const checkLoginStatus = async () => {
-  //     const loggedIn = false; // await your logic to check login status
-  //     setIsLoggedIn(loggedIn);
-  //   };
-  //   checkLoginStatus();
-  // }, []);
   useEffect(() => {
     const initializeMSAL = async () => {
       try {
@@ -78,25 +93,6 @@ function App() {
       console.error('Sign-out failed:', error);
     }
   };
-  const TabNavigator = ({
-    handleLoginStatusChange,
-    handleSignOut,
-  }: {
-    handleLoginStatusChange: (loggedIn: boolean) => void;
-    handleSignOut: () => void;
-  }) => {
-    return (
-      <Tab.Navigator
-        screenOptions={{
-          headerRight: () => <Button title="Logout" onPress={handleSignOut} />,
-        }}
-      >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-        <Tab.Screen name="Menu" component={MenuScreen} />
-      </Tab.Navigator>
-    );
-  };
 
   const handleLoginStatusChange = async (loggedIn: boolean) => {
     if (!loggedIn) {
@@ -113,16 +109,18 @@ function App() {
       <NavigationContainer>
         <Stack.Navigator>
           {isLoggedIn ? (
-            <Stack.Screen
-              name="Tabs"
-              component={() => (
-                <TabNavigator
-                  handleLoginStatusChange={handleLoginStatusChange}
-                  handleSignOut={handleSignOut}
-                />
-              )}
-              options={{ headerShown: false }}
-            />
+            <>
+              <Stack.Screen name="Tabs" options={{ headerShown: false }}>
+                {() => (
+                  <TabNavigator
+                    handleLoginStatusChange={handleLoginStatusChange}
+                    handleSignOut={handleSignOut}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="Watchlist" component={WatchlistScreen} />
+              <Stack.Screen name="Pendingrent" component={PendingrentScreen} />
+            </>
           ) : (
             <Stack.Screen name="Login">
               {props => (

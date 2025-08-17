@@ -75,6 +75,14 @@ code is in App.tsx file, handleLoginStatusChange function
    await Keychain.resetGenericPassword();
 ```
 
+### add a new screen
+
+1. add screen in screens folder
+2. add shortcut to menuscreen
+3. update variable RootTabParamList in types.ts file
+4. add this line to app.tsx file
+   <Tab.Screen name="Pendingrent" component={PendingrentScreen} />
+
 ## troubleshooting help
 
 1. When app suddenly stop working check whether you have installed any new npm packages
