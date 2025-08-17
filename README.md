@@ -89,3 +89,7 @@ code is in App.tsx file, handleLoginStatusChange function
 2. Go to android folder, and run "gradlew clean" and then start debugging
 3. Check from android studio whether the emulator is starting normally
 4. In some cases you might have to create a new device emulator
+
+### create apk
+
+1. gradlew assembleRelease
