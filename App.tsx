@@ -19,6 +19,8 @@ import LoginScreen from './screens/LoginScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Keychain from 'react-native-keychain';
 import { clearStoredToken } from './TokenHandler';
+import { SessionContext } from './SessionContext';
+import MenuScreen from './screens/MenuScreen';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -91,6 +93,7 @@ function App() {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
+        <Tab.Screen name="Menu" component={MenuScreen} />
       </Tab.Navigator>
     );
   };
@@ -106,31 +109,33 @@ function App() {
   };
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {isLoggedIn ? (
-          <Stack.Screen
-            name="Tabs"
-            component={() => (
-              <TabNavigator
-                handleLoginStatusChange={handleLoginStatusChange}
-                handleSignOut={handleSignOut}
-              />
-            )}
-            options={{ headerShown: false }}
-          />
-        ) : (
-          <Stack.Screen name="Login">
-            {props => (
-              <LoginScreen
-                {...props}
-                onLoginStatusChange={handleLoginStatusChange}
-              />
-            )}
-          </Stack.Screen>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SessionContext.Provider value={{ handleSignOut, handleLoginStatusChange }}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          {isLoggedIn ? (
+            <Stack.Screen
+              name="Tabs"
+              component={() => (
+                <TabNavigator
+                  handleLoginStatusChange={handleLoginStatusChange}
+                  handleSignOut={handleSignOut}
+                />
+              )}
+              options={{ headerShown: false }}
+            />
+          ) : (
+            <Stack.Screen name="Login">
+              {props => (
+                <LoginScreen
+                  {...props}
+                  onLoginStatusChange={handleLoginStatusChange}
+                />
+              )}
+            </Stack.Screen>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SessionContext.Provider>
   );
 }
 

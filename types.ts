@@ -3,6 +3,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 export type RootTabParamList = {
   Home: undefined;
   Profile: undefined;
+  Menu: undefined;
 };
 
 export type RootStackParamList = {
