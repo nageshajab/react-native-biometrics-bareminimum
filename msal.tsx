@@ -13,7 +13,8 @@ class MSALService {
     this.pca = new PublicClientApplication({
       auth: {
         clientId: '2e989240-a5fc-41c1-8ed2-089f2db5bc4f',
-        authority: 'https://login.microsoftonline.com/common',
+        authority:
+          'https://login.microsoftonline.com/51962fd4-2ece-4606-bdbe-cc684c94f8b0',
         redirectUri: 'msauth://com.biometrics/URKPrDTU8V1MeUOH4mnP2s1KgtM%3D',
       },
     });

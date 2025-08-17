@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   Pressable,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 import CheckBox from './Checkbox';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../types';
 import AuthService from '../AuthService';
 import { GetEvents } from '../api/EventsService';
+import { getStoredToken } from '../TokenHandler';
 
 type Props = BottomTabScreenProps<RootTabParamList, 'Home'>;
 
@@ -31,27 +33,32 @@ const HomeScreen = ({ navigation }: Props) => {
 
   const fetchEvents = async () => {
     setLoading(true); // Start loading
-    try {
-      const response = await GetEvents({
-        pageNumber,
-        searchtxt,
-        userid: '1fcca2c1-ffda-4cc5-b5bd-8959dec8d5af',
-        showAll: showAll,
-        pageSize: 5,
-      });
+    const token = await getStoredToken();
+    if (token && 'claims' in token) {
+      const claims = token.claims as {
+        name?: string;
+        preferred_username?: string;
+        oid?: string;
+        tid?: string;
+      };
+      try {
+        const response = await GetEvents({
+          pageNumber,
+          searchtxt,
+          userid: claims.oid,
+          showAll: showAll,
+          pageSize: 5,
+        });
 
-      console.log('fetching events:', {
-        pageNumber,
-        searchtxt,
-        userid: '1fcca2c1-ffda-4cc5-b5bd-8959dec8d5af',
-        showAll: showAll,
-        pageSize: 5,
-      });
-      setEvents(response.data.events);
-      setTotalPages(response.data.pagination.totalPages);
-    } catch (error) {
-      console.error('Error fetching events:', error);
+        setEvents(response.data.events);
+        setTotalPages(response.data.pagination.totalPages);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    } else {
+      ToastAndroid.show('Token not found', ToastAndroid.SHORT);
     }
+
     setLoading(false); // Stop loading
   };
 
