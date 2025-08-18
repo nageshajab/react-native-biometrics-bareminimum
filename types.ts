@@ -10,7 +10,8 @@ export type RootStackParamList = {
   Login: undefined;
   Tabs: undefined;
   Watchlist: undefined;
-  WatchlistForm: undefined;
+  
+    WatchlistForm: { id?: string };
   Pendingrent: undefined;
 };
 

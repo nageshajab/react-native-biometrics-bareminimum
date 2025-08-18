@@ -23,16 +23,18 @@ import {
   updateWatchlistItem,
 } from '../api/WatchlistService';
 import { RootStackParamList } from '../types';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { getUserId } from '../AuthService';
 
-type Props = {
-  id?: string;
-};
+type Props = NativeStackScreenProps<RootStackParamList, 'WatchlistForm'>;
 
-const WatchlistForm: React.FC<Props> = ({ id }) => {
+const WatchlistForm: React.FC<Props> = ({ route, navigation }) => {
   const [form, setForm] = useState<Watchlist | null>(null);
+  const { id } = route.params || {};
   const [loading, setLoading] = useState<boolean>(!!id);
   const rootNavigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -73,9 +75,15 @@ const WatchlistForm: React.FC<Props> = ({ id }) => {
   };
 
   const enumToOptions = (
-    e: Record<string, string>,
-  ): { label: string; value: string }[] =>
-    Object.values(e).map((v: string) => ({ label: v, value: v }));
+    e: Record<string, string | number>,
+  ): { label: string; value: number }[] => {
+    return Object.entries(e)
+      .filter(([key]) => isNaN(Number(key))) // Filter out reverse mappings
+      .map(([key, value]) => ({
+        label: key.replace(/([A-Z])/g, ' $1').trim(), // Optional: format label
+        value: value as number,
+      }));
+  };
 
   if (loading || !form) {
     return <ActivityIndicator style={{ marginTop: 50 }} />;
@@ -168,7 +176,6 @@ const WatchlistForm: React.FC<Props> = ({ id }) => {
     </ScrollView>
   );
 };
-
 const Dropdown = ({
   label,
   value,
@@ -176,9 +183,9 @@ const Dropdown = ({
   options,
 }: {
   label: string;
-  value: string;
-  onValueChange: (val: string) => void;
-  options: { label: string; value: string }[];
+  value: number;
+  onValueChange: (val: number) => void;
+  options: { label: string; value: number }[];
 }) => (
   <View style={styles.dropdown}>
     <RNPickerSelect

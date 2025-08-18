@@ -109,10 +109,13 @@ const WatchlistScreen = ({ navigation }: Props) => {
   };
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={styles.eventItem}>
+    <Pressable
+      style={styles.eventItem}
+      onPress={() => rootNavigation.navigate('WatchlistForm', { id: item.id })}
+    >
       <Text style={styles.title}>{item.title}</Text>
-      <Text> {getOtt(item.ott)}</Text>
-    </View>
+      <Text>{getOtt(item.ott)}</Text>
+    </Pressable>
   );
   const rootNavigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -135,7 +138,9 @@ const WatchlistScreen = ({ navigation }: Props) => {
           >
             <Button
               title="Add New"
-              onPress={() => rootNavigation.navigate('WatchlistForm')}
+              onPress={() =>
+                rootNavigation.navigate('WatchlistForm', { id: '' })
+              }
             />
           </View>
 
