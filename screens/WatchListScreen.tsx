@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 import {
   View,
   Text,
@@ -10,14 +11,16 @@ import {
   ToastAndroid,
   Button,
 } from 'react-native';
-import CheckBox from './Checkbox';
 import {
   BottomTabNavigationProp,
   BottomTabScreenProps,
 } from '@react-navigation/bottom-tabs';
 import { RootStackParamList, RootTabParamList } from '../types';
 import AuthService from '../AuthService';
-import { GetWatchlistItems } from '../api/WatchlistService';
+import {
+  GetWatchlistItems,
+  DeleteWatchlistitem,
+} from '../api/WatchlistService';
 import { getStoredToken } from '../TokenHandler';
 import {
   NativeStackNavigationProp,
@@ -27,6 +30,7 @@ import {
   CompositeNavigationProp,
   useNavigation,
 } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // or use any icon set you prefer
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Watchlist'>;
 type NavigationProp = CompositeNavigationProp<
@@ -94,7 +98,39 @@ const WatchlistScreen = ({ navigation }: Props) => {
 
     setLoading(false); // Stop loading
   };
+  const confirmDelete = (id: string) => {
+    Alert.alert(
+      'Confirm Delete',
+      'Are you sure you want to delete this item?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => deleteWatchlistItem(id),
+        },
+      ],
+      { cancelable: true },
+    );
+  };
 
+  const deleteWatchlistItem = async (id: string) => {
+    await DeleteWatchlistitem(id)
+      .then(() => {
+        ToastAndroid.show(
+          'Watchlist item deleted successfully',
+          ToastAndroid.SHORT,
+        );
+        fetchEvents();
+      })
+      .catch(error => {
+        console.error('Error deleting watchlist item:', error);
+        ToastAndroid.show('Error deleting watchlist item', ToastAndroid.SHORT);
+      });
+  };
   const PreviousPage = async () => {
     if (pageNumber > 1) {
       const newPage = pageNumber - 1;
@@ -120,13 +156,18 @@ const WatchlistScreen = ({ navigation }: Props) => {
   };
 
   const renderItem = ({ item }: { item: any }) => (
-    <Pressable
-      style={styles.eventItem}
-      onPress={() => rootNavigation.navigate('WatchlistForm', { id: item.id })}
-    >
-      <Text style={styles.title}>{item.title}</Text>
-      <Text>{getOtt(item.ott)}</Text>
-    </Pressable>
+    <View style={styles.eventItem}>
+      <View style={styles.itemContent}>
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.ott}>{getOtt(item.ott)}</Text>
+        </View>
+
+        <TouchableOpacity onPress={() => confirmDelete(item.id)}>
+          <Icon name="delete" size={24} color="red" />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
   // const rootNavigation =
   //   useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -204,6 +245,21 @@ const WatchlistScreen = ({ navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  itemContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  textContainer: {
+    flexDirection: 'column',
+    flex: 1,
+  },
+
+  ott: {
+    marginTop: 4,
+    color: '#555',
+  },
   container: { padding: 16 },
   header: {
     fontSize: 20,

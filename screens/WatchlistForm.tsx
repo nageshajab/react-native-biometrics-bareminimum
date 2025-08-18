@@ -173,6 +173,14 @@ const WatchlistForm: React.FC<Props> = ({ route, navigation }) => {
       <Button mode="contained" onPress={handleSubmit} style={styles.button}>
         {id ? 'Update' : 'Add'}
       </Button>
+
+      <Button
+        mode="contained"
+        onPress={() => rootNavigation.navigate('Watchlist')}
+        style={styles.button}
+      >
+        Back
+      </Button>
     </ScrollView>
   );
 };
