@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  ToastAndroid,
+} from 'react-native';
 import { TextInput, Button, Title } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import {
@@ -11,16 +17,25 @@ import {
   Rating,
   Ott,
 } from '../watchlisttypes';
-import { getwachlistitem } from '../api/WatchlistService';
+import {
+  getwachlistitem,
+  createWatchlistItem,
+  updateWatchlistItem,
+} from '../api/WatchlistService';
+import { RootStackParamList } from '../types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import { getUserId } from '../AuthService';
 
 type Props = {
   id?: string;
-  onSubmit: (data: Watchlist) => void;
 };
 
-const WatchlistForm: React.FC<Props> = ({ id, onSubmit }) => {
+const WatchlistForm: React.FC<Props> = ({ id }) => {
   const [form, setForm] = useState<Watchlist | null>(null);
   const [loading, setLoading] = useState<boolean>(!!id);
+  const rootNavigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   useEffect(() => {
     if (id) {
@@ -66,6 +81,32 @@ const WatchlistForm: React.FC<Props> = ({ id, onSubmit }) => {
     return <ActivityIndicator style={{ marginTop: 50 }} />;
   }
 
+  const handleSubmit = async () => {
+    if (!form) return;
+
+    const userId = await getUserId(); // Replace with dynamic value if needed
+    const formWithUser = { ...form, userId };
+
+    try {
+      if (id) {
+        await updateWatchlistItem(formWithUser);
+        ToastAndroid.show(
+          'Watchlist item updated successfully',
+          ToastAndroid.SHORT,
+        );
+      } else {
+        await createWatchlistItem(formWithUser);
+        ToastAndroid.show(
+          'Watchlist item created successfully',
+          ToastAndroid.SHORT,
+        );
+      }
+
+      rootNavigation.navigate('Watchlist');
+    } catch (err) {
+      ToastAndroid.show('Error submitting form', ToastAndroid.SHORT);
+    }
+  };
   return (
     <ScrollView style={styles.container}>
       <Title>{id ? 'Edit Watchlist Item' : 'Add Watchlist Item'}</Title>
@@ -81,13 +122,6 @@ const WatchlistForm: React.FC<Props> = ({ id, onSubmit }) => {
         label="Date"
         value={form.date}
         onChangeText={text => handleChange('date', text)}
-        style={styles.input}
-      />
-
-      <TextInput
-        label="User ID"
-        value={form.userId}
-        onChangeText={text => handleChange('userId', text)}
         style={styles.input}
       />
 
@@ -128,11 +162,7 @@ const WatchlistForm: React.FC<Props> = ({ id, onSubmit }) => {
         options={enumToOptions(Ott)}
       />
 
-      <Button
-        mode="contained"
-        onPress={() => onSubmit(form)}
-        style={styles.button}
-      >
+      <Button mode="contained" onPress={handleSubmit} style={styles.button}>
         {id ? 'Update' : 'Add'}
       </Button>
     </ScrollView>
