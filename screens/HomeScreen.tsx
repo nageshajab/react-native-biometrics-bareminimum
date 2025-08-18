@@ -15,6 +15,7 @@ import { RootTabParamList } from '../types';
 import AuthService from '../AuthService';
 import { GetEvents } from '../api/EventsService';
 import { getStoredToken } from '../TokenHandler';
+import { getUserId } from '../AuthService';
 
 type Props = BottomTabScreenProps<RootTabParamList, 'Home'>;
 
@@ -33,28 +34,18 @@ const HomeScreen = ({ navigation }: Props) => {
 
   const fetchEvents = async () => {
     setLoading(true); // Start loading
-    const token = await getStoredToken();
-    if (token && 'claims' in token) {
-      const claims = token.claims as {
-        name?: string;
-        preferred_username?: string;
-        oid?: string;
-        tid?: string;
-      };
-      try {
-        const response = await GetEvents({
-          pageNumber,
-          searchtxt,
-          userid: claims.oid,
-          showAll: showAll,
-          pageSize: 5,
-        });
+    const userid = await getUserId();
+    if (userid && userid != '') {
+      const response = await GetEvents({
+        pageNumber,
+        searchtxt,
+        userid: userid,
+        showAll: showAll,
+        pageSize: 4,
+      });
 
-        setEvents(response.data.events);
-        setTotalPages(response.data.pagination.totalPages);
-      } catch (error) {
-        console.error('Error fetching events:', error);
-      }
+      setEvents(response.data.events);
+      setTotalPages(response.data.pagination.totalPages);
     } else {
       ToastAndroid.show('Token not found', ToastAndroid.SHORT);
     }

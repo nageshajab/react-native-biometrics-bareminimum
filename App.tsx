@@ -2,6 +2,15 @@ import { useEffect, useState } from 'react';
 import { msalService } from './msal'; // adjust path as needed
 import { ToastAndroid, SafeAreaView } from 'react-native';
 import {
+  Watchlist,
+  Status,
+  WatchlistType,
+  Language,
+  Genre,
+  Rating,
+  Ott,
+} from './watchlisttypes';
+import {
   StatusBar,
   StyleSheet,
   useColorScheme,
@@ -23,6 +32,7 @@ import { SessionContext } from './SessionContext';
 import MenuScreen from './screens/MenuScreen';
 import WatchlistScreen from './screens/WatchListScreen';
 import PendingrentScreen from './screens/PendingRentScreen';
+import WatchlistForm from './screens/WatchlistForm';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -119,6 +129,26 @@ function App() {
                 )}
               </Stack.Screen>
               <Stack.Screen name="Watchlist" component={WatchlistScreen} />
+              <Stack.Screen name="WatchlistForm">
+                {props => (
+                  <WatchlistForm
+                    {...props}
+                    initialData={{
+                      title: '',
+                      date: '2022-01-01',
+                      status: Status.NotStarted,
+                      userId: 'user123',
+                      type: WatchlistType.Movie,
+                      language: Language.English,
+                      genre: Genre.Action,
+                      rating: Rating.ThreeStars,
+                      ott: Ott.Netflix,
+                    }}
+                    onSubmit={data => console.log(data)}
+                  />
+                )}
+              </Stack.Screen>
+
               <Stack.Screen name="Pendingrent" component={PendingrentScreen} />
             </>
           ) : (

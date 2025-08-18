@@ -4,13 +4,13 @@ export type RootTabParamList = {
  Home: undefined;
   Profile: undefined;
   Menu: undefined;
-
 };
 
 export type RootStackParamList = {
   Login: undefined;
   Tabs: undefined;
   Watchlist: undefined;
+  WatchlistForm: undefined;
   Pendingrent: undefined;
 };
 

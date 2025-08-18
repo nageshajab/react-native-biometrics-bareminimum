@@ -26,4 +26,18 @@ const AuthService = {
   },
 };
 
+export async function getUserId(): Promise<string> {
+  const token = await getStoredToken();
+  if (token && 'claims' in token) {
+    const claims = token.claims as {
+      name?: string;
+      preferred_username?: string;
+      oid?: string;
+      tid?: string;
+    };
+    return claims.oid ?? '';
+  }
+  return '';
+}
+
 export default AuthService;

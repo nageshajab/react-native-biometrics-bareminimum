@@ -8,6 +8,7 @@ import {
   Pressable,
   ActivityIndicator,
   ToastAndroid,
+  Button,
 } from 'react-native';
 import CheckBox from './Checkbox';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -15,7 +16,11 @@ import { RootStackParamList, RootTabParamList } from '../types';
 import AuthService from '../AuthService';
 import { GetWatchlistItems } from '../api/WatchlistService';
 import { getStoredToken } from '../TokenHandler';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Watchlist'>;
 
@@ -87,7 +92,7 @@ const WatchlistScreen = ({ navigation }: Props) => {
       // await fetchEvents();
     }
   };
-
+  const AddNew = async () => {};
   const NextPage = async () => {
     if (pageNumber < totalPages) {
       const newPage = pageNumber + 1;
@@ -109,6 +114,8 @@ const WatchlistScreen = ({ navigation }: Props) => {
       <Text> {getOtt(item.ott)}</Text>
     </View>
   );
+  const rootNavigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <View style={styles.container}>
@@ -126,11 +133,10 @@ const WatchlistScreen = ({ navigation }: Props) => {
               alignItems: 'center',
             }}
           >
-            <Text style={styles.header}>Home Screen</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={styles.subheader}>Show All</Text>
-              <CheckBox isChecked={showAll} onPress={handleCheckChange} />
-            </View>
+            <Button
+              title="Add New"
+              onPress={() => rootNavigation.navigate('WatchlistForm')}
+            />
           </View>
 
           <View style={styles.paginationControls}>
@@ -206,6 +212,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 10,
+    marginTop: 10,
   },
   loadingText: {
     marginTop: 10,
