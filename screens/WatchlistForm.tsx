@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ScrollView, View, StyleSheet, ActivityIndicator } from 'react-native';
 import { TextInput, Button, Title } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import {
@@ -11,27 +11,50 @@ import {
   Rating,
   Ott,
 } from '../watchlisttypes';
+import { getwachlistitem } from '../api/WatchlistService';
 
 type Props = {
-  initialData?: Watchlist;
+  id?: string;
   onSubmit: (data: Watchlist) => void;
 };
 
-const WatchlistForm: React.FC<Props> = ({ initialData, onSubmit }) => {
-  const [form, setForm] = useState<Watchlist>({
-    title: initialData?.title || '',
-    date: initialData?.date || new Date().toISOString().split('T')[0],
-    status: initialData?.status || Status.NotStarted,
-    userId: initialData?.userId || '',
-    type: initialData?.type || WatchlistType.Movie,
-    language: initialData?.language || Language.English,
-    genre: initialData?.genre || Genre.Action,
-    rating: initialData?.rating || Rating.ThreeStars,
-    ott: initialData?.ott || Ott.Netflix,
+const WatchlistForm: React.FC<Props> = ({ id, onSubmit }) => {
+  const [form, setForm] = useState<Watchlist | null>(null);
+  const [loading, setLoading] = useState<boolean>(!!id);
+
+  useEffect(() => {
+    if (id) {
+      // Replace with your actual API call
+      getwachlistitem(id)
+        .then(res => {
+          const formattedDate = res.data.date.split('T')[0];
+          setForm({ ...res.data, date: formattedDate });
+          setLoading(false);
+        })
+        .catch(() => {
+          // Handle error, fallback to empty form
+          setForm(getEmptyForm());
+          setLoading(false);
+        });
+    } else {
+      setForm(getEmptyForm());
+    }
+  }, [id]);
+
+  const getEmptyForm = (): Watchlist => ({
+    title: '',
+    date: new Date().toISOString().split('T')[0],
+    status: Status.NotStarted,
+    userId: '',
+    type: WatchlistType.Movie,
+    language: Language.English,
+    genre: Genre.Action,
+    rating: Rating.ThreeStars,
+    ott: Ott.Netflix,
   });
 
   const handleChange = (key: keyof Watchlist, value: any) => {
-    setForm(prev => ({ ...prev, [key]: value }));
+    setForm(prev => (prev ? { ...prev, [key]: value } : prev));
   };
 
   const enumToOptions = (
@@ -39,11 +62,13 @@ const WatchlistForm: React.FC<Props> = ({ initialData, onSubmit }) => {
   ): { label: string; value: string }[] =>
     Object.values(e).map((v: string) => ({ label: v, value: v }));
 
+  if (loading || !form) {
+    return <ActivityIndicator style={{ marginTop: 50 }} />;
+  }
+
   return (
     <ScrollView style={styles.container}>
-      <Title>
-        {initialData ? 'Edit Watchlist Item' : 'Add Watchlist Item'}
-      </Title>
+      <Title>{id ? 'Edit Watchlist Item' : 'Add Watchlist Item'}</Title>
 
       <TextInput
         label="Title"
@@ -108,7 +133,7 @@ const WatchlistForm: React.FC<Props> = ({ initialData, onSubmit }) => {
         onPress={() => onSubmit(form)}
         style={styles.button}
       >
-        {initialData ? 'Update' : 'Add'}
+        {id ? 'Update' : 'Add'}
       </Button>
     </ScrollView>
   );

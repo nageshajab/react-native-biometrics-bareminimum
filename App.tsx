@@ -130,23 +130,15 @@ function App() {
               </Stack.Screen>
               <Stack.Screen name="Watchlist" component={WatchlistScreen} />
               <Stack.Screen name="WatchlistForm">
-                {props => (
-                  <WatchlistForm
-                    {...props}
-                    initialData={{
-                      title: '',
-                      date: '2022-01-01',
-                      status: Status.NotStarted,
-                      userId: 'user123',
-                      type: WatchlistType.Movie,
-                      language: Language.English,
-                      genre: Genre.Action,
-                      rating: Rating.ThreeStars,
-                      ott: Ott.Netflix,
-                    }}
-                    onSubmit={data => console.log(data)}
-                  />
-                )}
+                {props => {
+                  return (
+                    <WatchlistForm
+                      {...props}
+                      id=""
+                      onSubmit={data => console.log(data)}
+                    />
+                  );
+                }}
               </Stack.Screen>
 
               <Stack.Screen name="Pendingrent" component={PendingrentScreen} />
