@@ -1,3 +1,4 @@
+import { NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type RootTabParamList = {
@@ -8,11 +9,11 @@ export type RootTabParamList = {
 
 export type RootStackParamList = {
   Login: undefined;
-  Tabs: undefined;
+  Tabs: NavigatorScreenParams<RootTabParamList>; // ✅ Accepts nested tab params
   Watchlist: undefined;
-  
-    WatchlistForm: { id?: string };
+  WatchlistForm: { id?: string };
   Pendingrent: undefined;
 };
+
 
 export type HomeScreenProps = NativeStackScreenProps<RootTabParamList , 'Home'>;

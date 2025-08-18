@@ -11,7 +11,10 @@ import {
   Button,
 } from 'react-native';
 import CheckBox from './Checkbox';
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import {
+  BottomTabNavigationProp,
+  BottomTabScreenProps,
+} from '@react-navigation/bottom-tabs';
 import { RootStackParamList, RootTabParamList } from '../types';
 import AuthService from '../AuthService';
 import { GetWatchlistItems } from '../api/WatchlistService';
@@ -20,9 +23,16 @@ import {
   NativeStackNavigationProp,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
+import {
+  CompositeNavigationProp,
+  useNavigation,
+} from '@react-navigation/native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Watchlist'>;
+type NavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<RootStackParamList>,
+  BottomTabNavigationProp<RootTabParamList>
+>;
 
 const WatchlistScreen = ({ navigation }: Props) => {
   const [searchtxt, setSearchtxt] = useState('');
@@ -31,6 +41,7 @@ const WatchlistScreen = ({ navigation }: Props) => {
   const [showAll, setShowAll] = useState(false);
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false); // ⏳ Loading state
+  const rootNavigation = useNavigation<NavigationProp>();
 
   useEffect(() => {
     AuthService.checkToken(navigation);
@@ -117,8 +128,8 @@ const WatchlistScreen = ({ navigation }: Props) => {
       <Text>{getOtt(item.ott)}</Text>
     </Pressable>
   );
-  const rootNavigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  // const rootNavigation =
+  //   useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <View style={styles.container}>
@@ -140,6 +151,14 @@ const WatchlistScreen = ({ navigation }: Props) => {
               title="Add New"
               onPress={() =>
                 rootNavigation.navigate('WatchlistForm', { id: '' })
+              }
+            />
+            <Button
+              title="Back"
+              onPress={() =>
+                rootNavigation.navigate('Tabs', {
+                  screen: 'Home',
+                })
               }
             />
           </View>

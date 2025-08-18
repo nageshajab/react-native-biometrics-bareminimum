@@ -131,7 +131,7 @@ function App() {
               <Stack.Screen name="Watchlist" component={WatchlistScreen} />
               <Stack.Screen name="WatchlistForm">
                 {props => {
-                  return <WatchlistForm {...props} id="" />;
+                  return <WatchlistForm {...props} />;
                 }}
               </Stack.Screen>
 
