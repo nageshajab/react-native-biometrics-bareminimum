@@ -53,19 +53,19 @@ const WatchlistScreen = ({ navigation }: Props) => {
   }, [navigation, pageNumber, showAll]);
   function getOtt(ott: number) {
     switch (ott) {
-      case 0:
-        return 'Netflix';
       case 1:
-        return 'Prime';
+        return 'Netflix';
       case 2:
-        return 'Hotstar';
+        return 'Prime';
       case 3:
-        return 'SonyLiv';
+        return 'Hotstar';
       case 4:
-        return 'Zee5';
+        return 'SonyLiv';
       case 5:
-        return 'YouTube';
+        return 'Zee5';
       case 6:
+        return 'YouTube';
+      case 7:
         return 'Other';
     }
   }
@@ -158,19 +158,20 @@ const WatchlistScreen = ({ navigation }: Props) => {
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.eventItem}>
       <View style={styles.itemContent}>
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.ott}>{getOtt(item.ott)}</Text>
-        </View>
-
+        <TouchableOpacity
+          onPress={() => navigation.navigate('WatchlistForm', { id: item.id })}
+        >
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.ott}>{getOtt(item.ott)}</Text>
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => confirmDelete(item.id)}>
           <Icon name="delete" size={24} color="red" />
         </TouchableOpacity>
       </View>
     </View>
   );
-  // const rootNavigation =
-  //   useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <View style={styles.container}>
