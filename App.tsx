@@ -33,6 +33,7 @@ import MenuScreen from './screens/MenuScreen';
 import WatchlistScreen from './screens/WatchListScreen';
 import PendingrentScreen from './screens/PendingRentScreen';
 import WatchlistForm from './screens/WatchlistForm';
+import PasswordlistScreen from './screens/PasswordListScreen';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -128,6 +129,10 @@ function App() {
                   />
                 )}
               </Stack.Screen>
+              <Stack.Screen
+                name="Passwordlist"
+                component={PasswordlistScreen}
+              />
               <Stack.Screen name="Watchlist" component={WatchlistScreen} />
               <Stack.Screen name="WatchlistForm">
                 {props => {

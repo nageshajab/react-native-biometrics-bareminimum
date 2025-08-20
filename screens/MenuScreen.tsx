@@ -36,6 +36,12 @@ const MenuScreen = ({ navigation }: Props) => {
           onPress={() => rootNavigation.navigate('Pendingrent')}
         />
       </View>
+      <View style={styles.button}>
+        <Button
+          title="Passwords"
+          onPress={() => rootNavigation.navigate('Passwordlist')}
+        />
+      </View>
     </View>
   );
 };

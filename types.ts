@@ -13,6 +13,8 @@ export type RootStackParamList = {
   Watchlist: undefined;
   WatchlistForm: { id?: string };
   Pendingrent: undefined;
+  Passwordlist:undefined;
+  PasswordForm: { id?: string };
 };
 
 
