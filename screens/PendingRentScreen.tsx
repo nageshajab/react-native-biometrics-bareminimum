@@ -11,12 +11,16 @@ import {
 } from 'react-native';
 import CheckBox from './Checkbox';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { RootTabParamList } from '../types';
+import { RootStackParamList, RootTabParamList } from '../types';
 import AuthService from '../AuthService';
-import { GetPendingRents } from '../api/RentService';
+import { getUserId } from '../AuthService';
+import { GetPendingRents, createRent } from '../api/RentService';
 import { getStoredToken } from '../TokenHandler';
-
-type Props = BottomTabScreenProps<RootTabParamList, 'Pendingrent'>;
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Alert } from 'react-native';
+// import RNFS from 'react-native-fs';
+// import Share from 'react-native-share';
+type Props = NativeStackScreenProps<RootStackParamList, 'Pendingrent'>;
 
 const PendingrentScreen = ({ navigation }: Props) => {
   const [events, setEvents] = useState<any[]>([]);
@@ -43,9 +47,9 @@ const PendingrentScreen = ({ navigation }: Props) => {
           month: 8,
           year: 2025,
         });
-        console.log(
-          'pending rents list ' + JSON.stringify(response.data.rents),
-        );
+        // console.log(
+        //   'pending rents list ' + JSON.stringify(response.data.rents),
+        // );
 
         setEvents(response.data.rents);
       } catch (error) {
@@ -57,10 +61,82 @@ const PendingrentScreen = ({ navigation }: Props) => {
 
     setLoading(false); // Stop loading
   };
+  const handleCreateRent = async (item: any) => {
+    var month = new Date().getMonth() + 1;
+    var formattedMonth = month < 10 ? `0${month}` : month.toString();
+    const userId = await getUserId();
+    try {
+      const payload = {
+        date: `${new Date().getFullYear()}-${formattedMonth}-03`,
+        paidAmount: 0,
+        remainingAmount: 0,
+        mseb: 0,
+        tenantName: item.tenantName,
+        userid: userId,
+      };
 
+      await createRent(payload);
+      ToastAndroid.show('✅ Rent created successfully', ToastAndroid.SHORT);
+    } catch (error) {
+      console.error('❌ Rent creation failed:', error);
+      ToastAndroid.show('❌ Failed to create rent', ToastAndroid.SHORT);
+    }
+  };
+  const addRent = async (item: any) => {
+    Alert.alert(
+      'Confirm',
+      `Are you sure you want to add rent for ${item.tenantName}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Create',
+          style: 'destructive',
+          onPress: async () => {
+            await handleCreateRent(item);
+            await fetchEvents(); // Refresh after success
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  };
+  const exportdata = async () => {
+    if (!events || events.length === 0) {
+      ToastAndroid.show('No data to export', ToastAndroid.SHORT);
+      return;
+    }
+
+    const csvHeader = 'Tenant Name,Paid Amount,Remaining Amount,MSEB\n';
+    const csvRows = events.map(
+      item =>
+        `${item.tenantName},${item.paidAmount || 0},${
+          item.remainingAmount || 0
+        },${item.mseb || 0}`,
+    );
+    const csvString = csvHeader + csvRows.join('\n');
+
+    // try {
+    //   const path = `${
+    //     RNFS.DocumentDirectoryPath
+    //   }/pending_rents_${Date.now()}.csv`;
+    //   await RNFS.writeFile(path, csvString, 'utf8');
+
+    //   await Share.open({
+    //     url: `file://${path}`,
+    //     type: 'text/csv',
+    //     title: 'Export Pending Rents',
+    //     failOnCancel: false,
+    //   });
+    // } catch (error) {
+    //   console.error('❌ Export failed:', error);
+    //   ToastAndroid.show('❌ Export failed', ToastAndroid.SHORT);
+    // }
+  };
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.eventItem}>
-      <Text style={styles.title}>{item}</Text>
+      <TouchableOpacity onPress={() => addRent(item)}>
+        <Text style={styles.title}>{item.tenantName}</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -78,9 +154,13 @@ const PendingrentScreen = ({ navigation }: Props) => {
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
+              marginBottom: 10,
             }}
           >
             <Text style={styles.header}>Pending Rents</Text>
+            <TouchableOpacity onPress={async () => await exportdata()}>
+              <Text style={styles.headerButton}>Export</Text>
+            </TouchableOpacity>
           </View>
 
           <FlatList
@@ -97,6 +177,13 @@ const PendingrentScreen = ({ navigation }: Props) => {
 
 const styles = StyleSheet.create({
   container: { padding: 16 },
+  headerButton: {
+    fontSize: 16,
+    color: '#007AFF',
+    fontWeight: 'bold',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
   header: {
     fontSize: 20,
     fontWeight: 'bold',
