@@ -23,7 +23,7 @@ import { navigationRef } from './navigationRef';
 import * as React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
-import ProfileScreen from './screens/ProfileScreen';
+
 import LoginScreen from './screens/LoginScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Keychain from 'react-native-keychain';
@@ -52,7 +52,7 @@ const TabNavigator = ({
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+
       <Tab.Screen name="Menu" component={MenuScreen} />
     </Tab.Navigator>
   );
